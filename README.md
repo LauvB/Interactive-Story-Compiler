@@ -10,23 +10,6 @@ Interactive Story Compiler is a compiler that transforms structured natural lang
 - Demonstrates finite-state machine behavior with clickable choices.
 - Lightweight, cross-platform, no installation required—works offline in any modern browser.
 
-## Project Structure
-
-```
-compiler_interactive_story/
-├── lexer.py          # Lexical analyzer (tokens generation)
-├── sintactic.py      # Syntactic analyzer (grammar validation)
-├── semantic.py       # Semantic analyzer (cross-reference checking)
-├── compiler.py       # Main compiler (output HTML generation)
-├── story.txt         # Input: your interactive story
-├── output.html       # Output: generated HTML (optional in version control)
-├── test.py           # Test lexer + parser
-├── test_semantic.py  # Full test lexer + parser + semantic
-├── run_compiler.py   # Script to generate final HTML
-├── .gitignore        # Ignore files like output.html
-└── README.md         # This file
-```
-
 ## How to Use
 
 1. Write your story in `story.txt` following the structured format:
