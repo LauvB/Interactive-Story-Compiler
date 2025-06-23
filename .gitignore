@@ -1,0 +1,10 @@
+# Ignore generated output file
+output.html
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore editor-specific files
+.vscode/

@@ -1,0 +1,15 @@
+scene: START
+text: "You wake up in a dark cave."
+choice: "Go left" -> DRAGON
+choice: "Go right" -> EXIT
+
+scene: DRAGON
+text: "A dragon appears!"
+choice: "Fight" -> END
+choice: "Run away" -> EXIT
+
+scene: EXIT
+text: "You found the way out."
+
+scene: END
+text: "The dragon devours you."
