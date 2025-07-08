@@ -36,16 +36,76 @@ class Compiler:
                 "<meta charset='UTF-8'>",
                 "<title>Interactive Story</title>",
                 "<style>",
-                "body { font-family: Arial, sans-serif; margin: 40px; }",
-                ".scene { display: none; }",
-                ".active { display: block; }",
-                "button { margin: 5px; padding: 8px 12px; border-radius: 4px; }",
-                "</style>",
-                "<script>",
-                "function showScene(id) {",
-                "  document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));",
-                "  document.getElementById(id).classList.add('active');",
-                "}",
+                """
+                    body {
+                    font-family: 'Segoe UI', sans-serif;
+                    background-color: #f4f4f9;
+                    color: #333;
+                    margin: 0;
+                    padding: 40px;
+                    line-height: 1.6;
+                    }
+
+                    h2 {
+                    font-size: 28px;
+                    color: #0078d7;
+                    text-align: center;
+                    margin-bottom: 20px;
+                    }
+
+                    p {
+                    font-size: 18px;
+                    margin-top: 10px;
+                    text-align: center;
+                    }
+
+                    .scene {
+                    display: none;
+                    padding: 30px;
+                    border-radius: 8px;
+                    background-color: white;
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                    max-width: 700px;
+                    margin: auto;
+                    }
+
+                    .active {
+                    display: block;
+                    }
+
+                    .button-group {
+                    display: flex;
+                    justify-content: space-between;
+                    flex-wrap: wrap;
+                    margin-top: 30px;
+                    }
+
+                    button {
+                    padding: 10px 24px;
+                    border: none;
+                    border-radius: 5px;
+                    background-color: #0078d7;
+                    color: white;
+                    font-size: 16px;
+                    cursor: pointer;
+                    transition: background-color 0.3s;
+                    flex: 1 1 auto;
+                    margin: 5px;
+                    }
+
+                    button:hover {
+                    background-color: #005ea6;
+                    }
+                                """,
+                                "</style>",
+                                "<script>",
+                                """
+                    function showScene(id) {
+                    document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+                    const target = document.getElementById(id);
+                    if (target) target.classList.add('active');
+                    }
+                """,
                 "</script>",
                 "</head>", "<body>"]
 
@@ -53,10 +113,13 @@ class Compiler:
             html.append(f"<div class='scene' id='{scene_id}'>")
             html.append(f"<h2>{scene_id}</h2>")
             html.append(f"<p>{content['text']}</p>")
-            for choice in content['choices']:
-                html.append(
-                    f"<button onclick=\"showScene('{choice['destination']}')\">{choice['text']}</button>"
-                )
+            if content['choices']:
+                html.append("<div class='button-group'>")
+                for choice in content['choices']:
+                    html.append(
+                        f"<button onclick=\"showScene('{choice['destination']}')\">{choice['text']}</button>"
+                    )
+                html.append("</div>")
             html.append("</div>")
 
         # Start the first scene active
@@ -66,3 +129,4 @@ class Compiler:
 
         with open(output_file, "w", encoding="utf-8") as f:
             f.write("\n".join(html))
+
