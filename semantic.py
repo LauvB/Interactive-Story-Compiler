@@ -69,4 +69,28 @@ class SemanticAnalyzer:
         if undefined_destinations:
             raise Exception(f"Undefined scene destinations: {undefined_destinations}")
 
+        # Check for unreachable scenes (scene is defined but never reached)
+        graph = {
+            scene: [choice["destination"] for choice in data["choices"]]
+            for scene, data in self.scenes.items()
+        }
+
+        reachable = set()
+
+        def dfs(scene_id):
+            if scene_id in reachable:
+                return
+            reachable.add(scene_id)
+            for neighbor in graph.get(scene_id, []):
+                dfs(neighbor)
+
+        if "START" not in self.defined_scene_ids:
+            raise Exception("Missing START scene. Every story must begin with scene: START")
+
+        dfs("START")
+
+        unreachable = self.defined_scene_ids - reachable
+        if unreachable:
+            raise Exception(f"Unreachable scenes detected: {unreachable}")
+
         return self.scenes
