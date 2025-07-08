@@ -39,25 +39,25 @@ class SyntacticAnalyzer:
 
     def scene(self):
         """Parses a single scene."""
-        if self.current_token.type == "SCENE":
-            self.advance()
-            if self.current_token.type == "IDENTIFIER":
-                scene_name = self.current_token.value
-                self.advance()
-                if self.current_token.type == "TEXT":
-                    self.advance()
-                    if self.current_token.type == "STRING":
-                        narrative = self.current_token.value
-                        self.advance()
-                        self.choice_list()
-                    else:
-                        self.error("STRING after TEXT")
-                else:
-                    self.error("TEXT after scene identifier")
-            else:
-                self.error("IDENTIFIER after SCENE")
-        else:
+        if not self.current_token or self.current_token.type != "SCENE":
             self.error("SCENE")
+        self.advance()
+
+        if not self.current_token or self.current_token.type != "IDENTIFIER":
+            self.error("IDENTIFIER after SCENE")
+        scene_name = self.current_token.value
+        self.advance()
+
+        if not self.current_token or self.current_token.type != "TEXT":
+            self.error("TEXT after scene identifier")
+        self.advance()
+
+        if not self.current_token or self.current_token.type != "STRING":
+            self.error("STRING after TEXT")
+        narrative = self.current_token.value
+        self.advance()
+
+        self.choice_list()
 
     def choice_list(self):
         """Parses zero or more choices."""
@@ -67,20 +67,19 @@ class SyntacticAnalyzer:
     def choice(self):
         """Parses a single choice."""
         self.advance()
-        if self.current_token and self.current_token.type == "STRING":
-            choice_text = self.current_token.value
-            self.advance()
-            if self.current_token and self.current_token.type == "ARROW":
-                self.advance()
-                if self.current_token and self.current_token.type == "IDENTIFIER":
-                    destination = self.current_token.value
-                    self.advance()
-                else:
-                    self.error("IDENTIFIER after ARROW")
-            else:
-                self.error("ARROW after choice text")
-        else:
+        if not self.current_token or self.current_token.type != "STRING":
             self.error("STRING after CHOICE")
+        choice_text = self.current_token.value
+        self.advance()
+
+        if not self.current_token or self.current_token.type != "ARROW":
+            self.error("ARROW after choice text")
+        self.advance()
+
+        if not self.current_token or self.current_token.type != "IDENTIFIER":
+            self.error("IDENTIFIER after ARROW")
+        destination = self.current_token.value
+        self.advance()
 
     def error(self, expected):
         """Raises a syntax error with details."""
