@@ -62,7 +62,7 @@ if __name__ == "__main__":
 
     if option == "1":
         try:
-            with open("story.txt", "r", encoding="utf-8") as f:
+            with open("src/story.txt", "r", encoding="utf-8") as f:
                 code = f.read()
             compiler.compile(code)
         except FileNotFoundError:

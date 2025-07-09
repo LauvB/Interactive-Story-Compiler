@@ -4,12 +4,51 @@
 
 Interactive Story Compiler is a compiler that transforms structured natural language stories into interactive HTML narratives. The project applies concepts from automata theory, context-free grammars (CFG), and formal language theory to produce educational, engaging, and visual outputs for exploring compilation principles.
 
+Intended users include:
+
+- Undergraduate computer science students
+- Educators introducing compiler construction
+- Hobbyist developers interested in storytelling and automation
+
 ## Features
 
 - Transforms structured `.txt` files into interactive, browser-ready HTML stories.
 - Demonstrates finite-state machine behavior with clickable choices.
 - Lightweight, cross-platform, no installation required—works offline in any modern browser.
 - GUI available (`story_gui.py`) for easier editing and compilation.
+
+## User Stories
+
+> _"As a student, I want to write simple branching stories in plain text so that I can visualize how compilers parse and generate structured outputs."_
+
+> _"As a teacher, I want to demonstrate context-free grammars and lexical analysis using relatable examples, not abstract math."_
+
+> _"As a developer, I want to generate interactive HTML stories from narrative input without needing advanced tools or servers."_
+
+## Repository Structure
+
+```
+compiler_interactive_story/
+│
+├── src/                    # Source code for the compiler
+│   ├── compiler.py         # Orchestrates the full pipeline
+│   ├── lexer.py            # Lexical analyzer: tokenizes input
+│   ├── syntactic.py        # Syntactic analyzer: parses token stream
+│   ├── semantic.py         # Semantic analyzer: builds & validates internal structure
+│   ├── story_gui.py        # Optional Tkinter interface (manual entry)
+│   ├── run_compiler.py     # CLI runner that compiles story.txt
+│   └── story.txt           # Example structured story input
+│
+├── tests/                  # Unit tests for each compiler phase
+│   └── test.py
+│
+├── docs/                   # Report, slides, paper, poster, run cases
+│   └── Report.pdf, Poster.pdf, etc.
+│
+├── README.md               # Full documentation and instructions
+├── .gitignore              # Files/folders excluded from Git tracking
+└── output.html             # Final generated HTML output (from compilation)
+```
 
 ## How to Use
 
@@ -50,153 +89,9 @@ python run_compiler.py
 - Python 3.x
 - No external libraries required
 
----
-
 ## Run Cases
 
-### Valid Case 1 – Minimal Story with Two Choices
-
-```txt
-scene: START
-text: "You wake up in a cave."
-choice: "Go left" -> LEFT
-choice: "Go right" -> RIGHT
-
-scene: LEFT
-text: "You enter the forest."
-
-scene: RIGHT
-text: "You walk toward the village."
-```
-
-**Expected Result**: Opens in browser with two clickable choices.
-
----
-
-### Valid Case 2 – Linear Story with One Scene Only
-
-```txt
-scene: START
-text: "The story ends before it begins."
-```
-
-**Expected Result**: Renders a single scene with no choices.
-
----
-
-### Valid Case 3 – Linear Story Using "Continue"
-
-```txt
-scene: START
-text: "You wake up in a peaceful meadow."
-choice: "Continue" -> PATH
-
-scene: PATH
-text: "You walk along a narrow path."
-choice: "Continue" -> LAKE
-
-scene: LAKE
-text: "You reach a quiet lake under the stars."
-```
-
-**Expected Result**: A linear story with a single button at each scene. The user progresses through multiple scenes by repeatedly choosing “Continue”.
-
----
-
-### Valid Case 4 – Looping Back
-
-```txt
-scene: START
-text: "Do you want to play again?"
-choice: "Yes" -> START
-choice: "No" -> END
-
-scene: END
-text: "Goodbye!"
-```
-
-**Expected Result**: Story loops back to the START scene if user chooses "Yes".
-
----
-
-### Invalid Case 1 – Missing START Scene
-
-```txt
-scene: INTRO
-text: "This story does not have a starting point."
-```
-
-**Error**:
-
-```
-Missing START scene. Every story must begin with scene: START
-```
-
----
-
-### Invalid Case 2 – Lexical Error (Unexpected Character)
-
-```txt
-scene: START
-text: ...
-```
-
-**Error**:
-
-```
-Unexpected character: .
-```
-
----
-
-### Invalid Case 3 – Missing Quotes in Text
-
-```txt
-scene: START
-text: You wake up in a dark cave
-```
-
-**Error**:
-
-```
-Syntax error: expected STRING after TEXT, found Token(IDENTIFIER, You)
-```
-
----
-
-### Invalid Case 4 – Destination Scene Not Defined
-
-```txt
-scene: START
-text: "Choose your path."
-choice: "Go left" -> UNKNOWN
-```
-
-**Error**:
-
-```
-Undefined scene destinations: {'UNKNOWN'}
-```
-
----
-
-### Invalid Case 5 – Unreachable Scene
-
-```txt
-scene: START
-text: "You wake up in a dark cave."
-
-scene: DRAGON
-text: "You meet a dragon."
-```
-
-**Error**:
-
-```
-Unreachable scenes detected: {'DRAGON'}
-```
-
----
+See detailed examples in [docs/run_cases.md](docs/run_cases.md)
 
 ## License
 

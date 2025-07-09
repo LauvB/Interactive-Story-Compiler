@@ -104,7 +104,7 @@ class StoryCompilerGUI:
             return
 
         try:
-            with open("story.txt", "w", encoding="utf-8") as f:
+            with open("src/story.txt", "w", encoding="utf-8") as f:
                 f.write(code)
 
             compiler = Compiler()
