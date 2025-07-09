@@ -39,6 +39,8 @@ INSTRUCTIONS = """  How to write your interactive story:
 
     🔒 Rules:
 
+        • The first scene must be named START
+        • All keywords (scene, text, choice) must be lowercase
         • All text must go inside double quotes ("...")
         • scene_id and destination must be simple identifiers
         • Each destination scene must be defined later

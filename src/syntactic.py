@@ -8,12 +8,9 @@ Author: Laura Beltrán & Santiago Sánchez
 # GRAMMAR DEFINITION:
 # <STORY>       -> <SCENELIST>
 # <SCENELIST>   -> <SCENE> <SCENELIST> | ε
-# <SCENE>       -> "scene:" <ID> "text:" <TEXT> <CHOICELIST>
+# <SCENE>       -> "scene" ":" IDENTIFIER "text" ":" STRING <CHOICELIST>
 # <CHOICELIST>  -> <CHOICE> <CHOICELIST> | ε
-# <CHOICE>      -> "choice:" <TEXT> "->" <ID>
-# <TEXT>        -> <STRING>
-# <ID>          -> <IDENTIFIER>
-
+# <CHOICE>      -> "choice" ":" STRING "->" IDENTIFIER
 
 class SyntacticAnalyzer:
     """This class represents the behavior of a syntactic analyzer."""
@@ -39,47 +36,55 @@ class SyntacticAnalyzer:
 
     def scene(self):
         """Parses a single scene."""
-        if not self.current_token or self.current_token.type != "SCENE":
-            self.error("SCENE")
-        self.advance()
+        if not self._match("KEYWORD", "scene"):
+            self.error("KEYWORD 'scene'")
+        if not self._match("SYMBOL", ":"):
+            self.error("':' after 'scene'")
 
-        if not self.current_token or self.current_token.type != "IDENTIFIER":
-            self.error("IDENTIFIER after SCENE")
-        scene_name = self.current_token.value
-        self.advance()
+        if not self._match("IDENTIFIER"):
+            self.error("scene identifier")
 
-        if not self.current_token or self.current_token.type != "TEXT":
-            self.error("TEXT after scene identifier")
-        self.advance()
+        if not self._match("KEYWORD", "text"):
+            self.error("KEYWORD 'text'")
+        if not self._match("SYMBOL", ":"):
+            self.error("':' after 'text'")
 
-        if not self.current_token or self.current_token.type != "STRING":
-            self.error("STRING after TEXT")
-        narrative = self.current_token.value
-        self.advance()
+        if not self._match("STRING"):
+            self.error("scene narrative (quoted string)")
 
         self.choice_list()
 
     def choice_list(self):
         """Parses zero or more choices."""
-        while self.current_token and self.current_token.type == "CHOICE":
+        while self.current_token and self.current_token.type == "KEYWORD" and self.current_token.value == "choice":
             self.choice()
 
     def choice(self):
         """Parses a single choice."""
-        self.advance()
-        if not self.current_token or self.current_token.type != "STRING":
-            self.error("STRING after CHOICE")
-        choice_text = self.current_token.value
-        self.advance()
+        if not self._match("KEYWORD", "choice"):
+            self.error("KEYWORD 'choice'")
+        if not self._match("SYMBOL", ":"):
+            self.error("':' after 'choice'")
 
-        if not self.current_token or self.current_token.type != "ARROW":
-            self.error("ARROW after choice text")
-        self.advance()
+        if not self._match("STRING"):
+            self.error("choice text (quoted string)")
 
-        if not self.current_token or self.current_token.type != "IDENTIFIER":
-            self.error("IDENTIFIER after ARROW")
-        destination = self.current_token.value
+        if not self._match("SYMBOL", "->"):
+            self.error("'->' after choice text")
+
+        if not self._match("IDENTIFIER"):
+            self.error("destination scene identifier")
+
+    def _match(self, expected_type, expected_value=None):
+        """Checks if the current token matches the expected type (and optionally value), then advances."""
+        if self.current_token is None:
+            return False
+        if self.current_token.type != expected_type:
+            return False
+        if expected_value is not None and self.current_token.value != expected_value:
+            return False
         self.advance()
+        return True
 
     def error(self, expected):
         """Raises a syntax error with details."""

@@ -6,6 +6,8 @@ choice:), identifiers, arrows (->), and strings (narrative text enclosed in quot
 Author: Laura Beltrán & Santiago Sánchez
 """
 
+import re
+
 class Token:
     """This class represents a token with type and value."""
 
@@ -22,11 +24,9 @@ class LexicalAnalyzer:
 
     def __init__(self):
         self.token_specification = [
-            ("SCENE", r"scene:"),
-            ("TEXT", r"text:"),
-            ("CHOICE", r"choice:"),
-            ("ARROW", r"->"),
-            ("IDENTIFIER", r"[A-Za-z0-9_]+"),
+            ("KEYWORD", r"\b(scene|text|choice)\b"),
+            ("SYMBOL", r":|->"),
+            ("IDENTIFIER", r"[A-Za-z_][A-Za-z0-9_]*"),
             ("STRING", r"\".*?\""),  # quoted string
             ("NEWLINE", r"\n"),
             ("SKIP", r"[ \t]+"),
@@ -34,9 +34,8 @@ class LexicalAnalyzer:
         ]
 
     def lex(self, code):
-        import re
         tokens = []
-        tok_regex = "|".join(f"(?P<{pair[0]}>{pair[1]})" for pair in self.token_specification)
+        tok_regex = "|".join(f"(?P<{name}>{pattern})" for name, pattern in self.token_specification)
 
         for mo in re.finditer(tok_regex, code):
             kind = mo.lastgroup

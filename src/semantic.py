@@ -18,58 +18,62 @@ class SemanticAnalyzer:
         n = len(self.tokens)
 
         while i < n:
-            token = self.tokens[i]
-            if token.type == "SCENE":
-                # Parse scene header
-                if i+1 >= n or self.tokens[i+1].type != "IDENTIFIER":
-                    raise Exception("Expected IDENTIFIER after SCENE")
-                scene_id = self.tokens[i+1].value
-                self.defined_scene_ids.add(scene_id)
-                i += 2
-
-                # Parse text
-                if i >= n or self.tokens[i].type != "TEXT":
-                    raise Exception(f"Expected TEXT in scene {scene_id}")
+            # Expect: scene : IDENTIFIER
+            if not self._match(i, "KEYWORD", "scene"):
                 i += 1
+                continue
+            if not self._match(i + 1, "SYMBOL", ":"):
+                raise Exception("Expected ':' after 'scene'")
+            if not self._match(i + 2, "IDENTIFIER"):
+                raise Exception("Expected scene identifier after 'scene:'")
 
-                if i >= n or self.tokens[i].type != "STRING":
-                    raise Exception(f"Expected STRING after TEXT in scene {scene_id}")
-                scene_text = self.tokens[i].value.strip('"')
-                i += 1
+            scene_id = self.tokens[i + 2].value
+            self.defined_scene_ids.add(scene_id)
+            i += 3
 
-                # Prepare scene entry
-                self.scenes[scene_id] = {"text": scene_text, "choices": []}
+            # Expect: text : "..."
+            if not self._match(i, "KEYWORD", "text"):
+                raise Exception(f"Expected 'text' in scene {scene_id}")
+            if not self._match(i + 1, "SYMBOL", ":"):
+                raise Exception(f"Expected ':' after 'text' in scene {scene_id}")
+            if not self._match(i + 2, "STRING"):
+                raise Exception(f"Expected STRING after text: in scene {scene_id}")
+            scene_text = self.tokens[i + 2].value.strip('"')
+            i += 3
 
-                # Parse optional choices
-                while i < n and self.tokens[i].type == "CHOICE":
-                    i += 1
-                    if i >= n or self.tokens[i].type != "STRING":
-                        raise Exception("Expected STRING after CHOICE")
-                    choice_text = self.tokens[i].value.strip('"')
-                    i += 1
+            # Create scene entry
+            self.scenes[scene_id] = {"text": scene_text, "choices": []}
 
-                    if i >= n or self.tokens[i].type != "ARROW":
-                        raise Exception("Expected '->' after choice text")
-                    i += 1
+            # Handle zero or more choices
+            while i < n and self._match(i, "KEYWORD", "choice"):
+                if not self._match(i + 1, "SYMBOL", ":"):
+                    raise Exception("Expected ':' after 'choice'")
+                if not self._match(i + 2, "STRING"):
+                    raise Exception("Expected STRING after choice:")
+                if not self._match(i + 3, "SYMBOL", "->"):
+                    raise Exception("Expected '->' after choice string")
+                if not self._match(i + 4, "IDENTIFIER"):
+                    raise Exception("Expected destination scene identifier after '->'")
 
-                    if i >= n or self.tokens[i].type != "IDENTIFIER":
-                        raise Exception("Expected destination IDENTIFIER after '->'")
-                    destination = self.tokens[i].value
-                    self.referenced_scene_ids.add(destination)
+                choice_text = self.tokens[i + 2].value.strip('"')
+                destination = self.tokens[i + 4].value
+                self.referenced_scene_ids.add(destination)
 
-                    self.scenes[scene_id]["choices"].append(
-                        {"text": choice_text, "destination": destination}
-                    )
-                    i += 1
-            else:
-                i += 1
+                self.scenes[scene_id]["choices"].append({
+                    "text": choice_text,
+                    "destination": destination
+                })
+                i += 5
 
-        # Semantic validation: check for undefined destinations
+        # Semantic validation
+        if "START" not in self.defined_scene_ids:
+            raise Exception("Missing START scene. Every story must begin with scene: START")
+
         undefined_destinations = self.referenced_scene_ids - self.defined_scene_ids
         if undefined_destinations:
             raise Exception(f"Undefined scene destinations: {undefined_destinations}")
 
-        # Check for unreachable scenes (scene is defined but never reached)
+        # Unreachable scenes check
         graph = {
             scene: [choice["destination"] for choice in data["choices"]]
             for scene, data in self.scenes.items()
@@ -84,9 +88,6 @@ class SemanticAnalyzer:
             for neighbor in graph.get(scene_id, []):
                 dfs(neighbor)
 
-        if "START" not in self.defined_scene_ids:
-            raise Exception("Missing START scene. Every story must begin with scene: START")
-
         dfs("START")
 
         unreachable = self.defined_scene_ids - reachable
@@ -94,3 +95,14 @@ class SemanticAnalyzer:
             raise Exception(f"Unreachable scenes detected: {unreachable}")
 
         return self.scenes
+
+    def _match(self, i, expected_type, expected_value=None):
+        """Checks if token i matches type and optional value."""
+        if i >= len(self.tokens):
+            return False
+        token = self.tokens[i]
+        if token.type != expected_type:
+            return False
+        if expected_value is not None and token.value != expected_value:
+            return False
+        return True
