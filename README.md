@@ -52,7 +52,36 @@ compiler_interactive_story/
 
 ## How to Use
 
-1. Write your story in `story.txt` following the structured format:
+You can compile your interactive story in two ways: **from the command line** or **through a graphical interface**.
+
+### Option A: Command-line (CLI)
+
+1. Open a terminal and navigate to the project root.
+
+2. Run the compiler:
+
+```bash
+python src/run_compiler.py
+```
+
+3. Select one of the options:
+
+- Option 1: Compile the story written in `story.txt` (inside the `src/` folder).
+- Options 2 and 3: Compile predefined examples.
+
+This creates `output.html` in the project root.
+
+4. Open `output.html` in any browser to explore your interactive story.
+
+### Option B: Graphical Interface (GUI)
+
+1. Launch the editor interface:
+
+```bash
+python src/story_gui.py
+```
+
+2. Write your story in the text box following this **structured format**:
 
 ```txt
 scene: START
@@ -67,13 +96,22 @@ scene: EXIT
 text: "You found the way out."
 ```
 
-2. Run the compiler:
+**Important Rules**:
 
-```bash
-python run_compiler.py
-```
+- The first scene must be named `START`.
+- All keywords (`scene`, `text`, `choice`) must be lowercase.
+- Text must be inside **double quotes** (`"`).
+- Choices must follow the format: `choice "text" -> DESTINATION_ID`.
+- Each scene must be defined only once.
 
-3. Open `output.html` in any browser to explore your interactive story.
+3. Click **Compile** to validate and generate the interactive story.
+
+4. The result (`output.html`) opens in your browser automatically.
+
+### Explore Your Story
+
+- The first scene (`START`) will appear by default.
+- Click buttons to follow your own adventure.
 
 ## Module Overview
 

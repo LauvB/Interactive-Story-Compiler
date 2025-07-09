@@ -53,6 +53,11 @@ text: "You reach a quiet lake under the stars."
 
 ```txt
 scene: START
+text: "Wanna play?"
+choice: "Yes" -> AGAIN
+choice: "No" -> END
+
+scene: AGAIN
 text: "Do you want to play again?"
 choice: "Yes" -> START
 choice: "No" -> END
@@ -105,7 +110,7 @@ text: You wake up in a dark cave
 **Error**:
 
 ```
-Syntax error: expected STRING after TEXT, found Token(IDENTIFIER, You)
+Syntax error: expected scene narrative (quoted string), found Token(IDENTIFIER, You)
 ```
 
 ---
