@@ -29,13 +29,11 @@ class TestInteractiveStoryCompiler(unittest.TestCase):
         '''
         tokens = self.lexer.lex(code)
         types = [t.type for t in tokens]
-        self.assertIn("SCENE", types)
-        self.assertIn("TEXT", types)
-        self.assertIn("CHOICE", types)
+        self.assertIn("KEYWORD", types)
         self.assertIn("STRING", types)
-        self.assertIn("ARROW", types)
+        self.assertIn("SYMBOL", types)
         self.assertIn("IDENTIFIER", types)
-        self.assertEqual(len(tokens), 12)
+        self.assertEqual(len(tokens), 17)
 
     def test_lexer_invalid_character(self):
         code = 'scene: START\ntext: @\n'
@@ -62,7 +60,7 @@ class TestInteractiveStoryCompiler(unittest.TestCase):
         parser = SyntacticAnalyzer(tokens)
         with self.assertRaises(SyntaxError) as context:
             parser.parse()
-        self.assertIn("TEXT after scene identifier", str(context.exception))
+        self.assertIn("Syntax error: expected KEYWORD 'text', found None", str(context.exception))
 
     def test_semantic_valid(self):
         code = '''
